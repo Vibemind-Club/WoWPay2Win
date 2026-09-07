@@ -46,23 +46,29 @@ export type TierConfigMap = ReadonlyMap<Tier, TierConfig>
 //
 // A BoeKey names one selectable entry in the picker. For a tier without
 // splitBySecondary it is just the item id ("271444"). For a split tier it is
-// the item id plus the sorted secondary pair ("271444:12" = item 271444 with
-// Haste/Mastery, using the ALL_SECONDARIES key digits). Keys are strings so
-// they survive the URL query and localStorage unchanged.
+// the item id plus the ORDERED secondary pair ("271444:12" = item 271444 with
+// Haste/Mastery, "271444:21" = Mastery/Haste, using the ALL_SECONDARIES key
+// digits). Order is kept because the game keeps it: the first-listed stat is
+// the larger allocation, so the two orderings are different items with
+// different prices. Keys are strings so they survive the URL query and
+// localStorage unchanged.
 // ----------------------------------------------------------------------------
 
 export type BoeKey = Brand<string, 'BoeKey'>
 
 export type SecondaryPair = Readonly<[Secondary, Secondary]>
 
-// Every unordered pair of the four secondaries, in a stable display order.
+// Every ORDERED pair of distinct secondaries (12), grouped by the leading stat
+// so the picker reads "Crit / Haste, Crit / Mastery, Crit / Vers, Haste / Crit ...".
 export const ALL_SECONDARY_PAIRS: ReadonlyArray<SecondaryPair> = (() => {
     const pairs = new Array<SecondaryPair>()
     const keys = ALL_SECONDARIES.map((secondary) => secondary.key)
 
-    for (let i = 0; i < keys.length; i++) {
-        for (let j = i + 1; j < keys.length; j++) {
-            pairs.push([keys[i], keys[j]])
+    for (const first of keys) {
+        for (const second of keys) {
+            if (first !== second) {
+                pairs.push([first, second])
+            }
         }
     }
 
@@ -76,8 +82,7 @@ export function makeBoeKey(itemId: ItemId, pair?: SecondaryPair): BoeKey {
         return `${itemId}` as BoeKey
     }
 
-    const sorted = [...pair].toSorted((a, b) => a - b)
-    return `${itemId}${KEY_DELIMITER}${sorted.join('')}` as BoeKey
+    return `${itemId}${KEY_DELIMITER}${pair.join('')}` as BoeKey
 }
 
 export function parseBoeKey(key: BoeKey): { itemId: ItemId; pair?: SecondaryPair } | null {
@@ -112,9 +117,11 @@ export function getSecondaryPairLabel(pair: SecondaryPair): string {
 }
 
 // The keys an auction can match. A split tier matches on item + its rolled
-// pair; an auction whose pair cannot be read (no modifiers on the listing)
-// falls back to the bare item key, which a split tier never lists - so such a
-// listing is simply not shown rather than being mis-filed under a variant.
+// pair in the listing's own order (modifier 29 first, 30 second - the order the
+// game shows on the tooltip); an auction whose pair cannot be read (no
+// modifiers on the listing) falls back to the bare item key, which a split
+// tier never lists - so such a listing is simply not shown rather than being
+// mis-filed under a variant.
 export function getAuctionBoeKey(auction: ItemAuction, splitBySecondary: boolean): BoeKey {
     if (!splitBySecondary) {
         return makeBoeKey(auction.itemId)

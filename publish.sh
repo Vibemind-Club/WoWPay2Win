@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build the SPA and ship it to https://stykasheets.com/boemarket/
+# Build the SPA and ship it to https://stykasheets.com/wowpay2win/
 #
 #   ./publish.sh              build + ship + verify
 #   SKIP_BUILD=1 ./publish.sh ship the existing dist/web
@@ -8,8 +8,8 @@
 # What this touches on the box: $TARGET/index.html, the hashed main.<hash>.js /
 # .css (+ .map) and the static images the build copies from src/web/static.
 # What it NEVER touches: $TARGET/.htaccess (ships from the stykasheets repo via
-# its deploy.sh, mapped as boemarket/*) and $TARGET/data/ (written every 30
-# minutes by loothelper/cron_boemarket.php). Old hashed bundles that the new
+# its deploy.sh, mapped as wowpay2win/*) and $TARGET/data/ (written every 30
+# minutes by loothelper/cron_wowpay2win.php). Old hashed bundles that the new
 # index.html no longer references are pruned after the swap.
 #
 # Order matters for a no-downtime swap: the new hashed bundle lands first,
@@ -19,8 +19,8 @@ set -euo pipefail
 
 BOX="${SLE_BOX:-evan@136.113.175.22}"
 KEY="${SLE_KEY:-$HOME/.ssh/id_ed25519}"
-TARGET="/var/www/stykasheets/boemarket"
-URL="https://stykasheets.com/boemarket/"
+TARGET="/var/www/stykasheets/wowpay2win"
+URL="https://stykasheets.com/wowpay2win/"
 
 # MSYS/Git-Bash mangles absolute remote paths into Windows paths.
 export MSYS_NO_PATHCONV=1

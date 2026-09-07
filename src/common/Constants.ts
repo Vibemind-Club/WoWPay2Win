@@ -1,17 +1,17 @@
-export const APP_NAME = 'BoE Market'
-export const APP_DESC = 'Every raid BoE listed on every auction house in each region, split by secondary-stat pair and shown with its real item level.'
+export const APP_NAME = 'WoWPay2Win'
+export const APP_DESC = 'Every raid BoE listed on every auction house in each region, split by secondary-stat roll and shown with its real item level.'
 export const OG_DESC = 'Tired of being bad in World of Warcraft? Just swipe your credit card and buy your BiS gear off the auction house!'
 
 // Where this build is served from. Every absolute URL the app emits (bundle,
 // data files, static images, the router base) hangs off this so the SPA can
 // live under a path instead of a domain root.
-export const BASE_PATH = '/boemarket/'
-export const WEB_URL = 'https://stykasheets.com/boemarket/'
+export const BASE_PATH = '/wowpay2win/'
+export const WEB_URL = 'https://stykasheets.com/wowpay2win/'
 
 // ----------------------------------------------------------------------------
 // Fork provenance. This project is a fork of WoWPay2Win by Stephen Li
 // (Trinovantes), AGPL-3.0. The upstream site is also where the auction data
-// this deployment serves comes from (see boemarket/data.php in the stykasheets
+// this deployment serves comes from (see cron_wowpay2win.php in the stykasheets
 // repo) - keep both credited wherever the app names itself.
 // ----------------------------------------------------------------------------
 export const UPSTREAM_NAME = 'WoWPay2Win'

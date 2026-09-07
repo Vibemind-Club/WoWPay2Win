@@ -12,8 +12,9 @@ import { FORK_REPO_URL, HOST_HUB_URL, HOST_NAME, HOST_URL, UPSTREAM_AUTHOR, UPST
         </p>
         <p>
             What <a :href="HOST_URL">{{ HOST_NAME }}</a> changed: every raid BoE is listed once per
-            secondary-stat pair, so one variant can be viewed and priced on its own, and the
-            table shows the real item level next to the difficulty.
+            secondary-stat pair (Crit / Vers and Vers / Crit are different rolls, so both are
+            listed), so one variant can be viewed and priced on its own, and the table shows
+            the real item level next to the difficulty.
         </p>
         <p class="links">
             <a :href="FORK_REPO_URL">Fork source</a>
