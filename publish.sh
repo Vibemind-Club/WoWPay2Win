@@ -57,16 +57,30 @@ done
 scp -q -i "$KEY" dist/web/index.html "$BOX:$TARGET/index.html.publishtmp"
 remote "mv '$TARGET/index.html.publishtmp' '$TARGET/index.html'"
 
-# Prune hashed files the new build no longer references. The keep-list is every
-# <name>.<contenthash>.js/.css named by index.html OR by the entry bundle (the
-# lazy chunks - 878.<hash>.js and friends - are referenced from main.<hash>.js,
-# not from the HTML). .htaccess, the images and data/ are never touched.
-remote "cd '$TARGET' && keep=\"\$(cat index.html '$bundle' | grep -oE '[0-9A-Za-z_-]+\.[0-9a-f]{16,}\.(js|css)' | sort -u)\"
+# Prune hashed files the new build no longer references. Webpack names the
+# lazy chunks (562.<hash>.js, 878.<hash>.js ...) from a {id:"hash"} map inside
+# main.<hash>.js, so the FILENAMES never appear anywhere - only the hashes do.
+# The keep-list is therefore every 16+ hex contenthash present in index.html
+# or the entry bundle, and a hashed file survives if its hash is in that list.
+# .htaccess, the images and data/ have no hash and are never touched.
+remote "cd '$TARGET' && keep=\"\$(cat index.html '$bundle' | grep -oE '[0-9a-f]{16,}' | sort -u)\"
 for old in *.[0-9a-f]*.js *.[0-9a-f]*.css *.[0-9a-f]*.js.map *.[0-9a-f]*.css.map *.[0-9a-f]*.js.LICENSE.txt; do
   [ -e \"\$old\" ] || continue
-  base=\"\$(printf '%s' \"\$old\" | sed -E 's/\.(map|LICENSE\.txt)$//')\"
-  printf '%s\n' \"\$keep\" | grep -qx \"\$base\" || { rm -f \"\$old\"; echo \"  pruned \$old\"; }
+  hash=\"\$(printf '%s' \"\$old\" | grep -oE '\.[0-9a-f]{16,}\.' | head -1 | tr -d .)\"
+  [ -n \"\$hash\" ] || continue
+  printf '%s\n' \"\$keep\" | grep -qx \"\$hash\" || { rm -f \"\$old\"; echo \"  pruned \$old\"; }
 done"
+
+# Every hashed asset the build emitted must answer 200 after the prune - this
+# is what catches a prune rule that ate a live chunk.
+say "verifying every built asset is served ..."
+for f in "${files[@]}"; do
+  case "$f" in
+    *.map|*.LICENSE.txt) continue ;;
+  esac
+  code="$(curl -s -m 20 -o /dev/null -w '%{http_code}' "$URL$f")"
+  [ "$code" = "200" ] || die "$f answered http $code"
+done
 
 say "verifying $URL ..."
 live="$(curl -s -m 20 "$URL")"
