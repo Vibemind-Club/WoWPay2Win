@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, type Router } from 'vue-router'
 import { routes } from './routes.ts'
+import { BASE_PATH } from '../../../common/Constants.ts'
 
 // ----------------------------------------------------------------------------
 // Router
@@ -7,7 +8,7 @@ import { routes } from './routes.ts'
 
 export function createAppRouter(): Router {
     return createRouter({
-        history: createWebHistory(),
+        history: createWebHistory(BASE_PATH),
         routes,
     })
 }

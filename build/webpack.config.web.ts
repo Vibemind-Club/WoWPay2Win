@@ -7,7 +7,7 @@ import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
 import merge from 'webpack-merge'
 import { srcWebDir, distWebDir, isDev, staticDir } from './BuildConstants.ts'
 import { isAnalyze } from './BuildSecret.ts'
-import { AUCTIONS_DATA_DIR } from '../src/common/Constants.ts'
+import { AUCTIONS_DATA_DIR, BASE_PATH } from '../src/common/Constants.ts'
 import { commonConfig } from './webpack.common.ts'
 
 // ----------------------------------------------------------------------------
@@ -23,18 +23,20 @@ export default merge.default(commonConfig, {
 
     output: {
         path: distWebDir,
-        publicPath: '/',
+        publicPath: BASE_PATH,
         filename: isDev
             ? '[name].js'
             : '[name].[contenthash].js',
     },
 
     devServer: {
-        historyApiFallback: true,
+        historyApiFallback: {
+            index: `${BASE_PATH}index.html`,
+        },
         static: [
             {
                 directory: AUCTIONS_DATA_DIR,
-                publicPath: '/data',
+                publicPath: `${BASE_PATH}data`,
             },
         ],
     },

@@ -22,7 +22,7 @@ const selectedDifficulty = computed<SelectedDifficulty>({
         class="group vpad"
     >
         <h2>
-            Item Level
+            Difficulty
         </h2>
 
         <q-list dense>

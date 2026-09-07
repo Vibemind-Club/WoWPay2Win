@@ -30,7 +30,7 @@ async function main() {
         },
     })
 
-    if (!__IS_DEV__) {
+    if (!__IS_DEV__ && SENTRY_DSN !== '') {
         Sentry.init({
             app,
             release: __GIT_HASH__,

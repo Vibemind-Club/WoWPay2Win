@@ -1,7 +1,10 @@
 import { useFilterStore } from './Filter/useFilterStore.ts'
 
+// V2 (fork): the boes filter changed from item ids to string BoeKeys, so a
+// state saved by upstream's key would import as garbage. The old key is swept
+// by cleanLocalStorage() on the next load.
 type HydrationStateMap = {
-    ['__INITIAL_FILTER_STATE__']: ReturnType<typeof useFilterStore>['$state']
+    ['__INITIAL_FILTER_STATE_V2__']: ReturnType<typeof useFilterStore>['$state']
 }
 
 type HydrationKey = keyof HydrationStateMap
@@ -33,7 +36,7 @@ export function loadStateFromLocalStorage<K extends keyof HydrationStateMap>(key
 
 export function cleanLocalStorage(): void {
     const hydrationKeys: Array<HydrationKey> = [
-        '__INITIAL_FILTER_STATE__',
+        '__INITIAL_FILTER_STATE_V2__',
     ]
 
     for (let i = 0; i < localStorage.length; i++) {

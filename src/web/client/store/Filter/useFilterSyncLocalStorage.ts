@@ -7,7 +7,7 @@ export function useFilterSyncLocalStorage() {
     const filterStore = useFilterStore()
 
     // Load state from localStorage if there's no init query
-    const savedState = loadStateFromLocalStorage('__INITIAL_FILTER_STATE__')
+    const savedState = loadStateFromLocalStorage('__INITIAL_FILTER_STATE_V2__')
     const hasNoInitQuery = Object.keys(router.currentRoute.value.query).length === 0
     if (savedState && hasNoInitQuery) {
         filterStore.$patch(savedState)
@@ -15,6 +15,6 @@ export function useFilterSyncLocalStorage() {
 
     // Write changes to localStorage
     filterStore.$subscribe((mutation, state) => {
-        saveStateToLocalStorage('__INITIAL_FILTER_STATE__', state)
+        saveStateToLocalStorage('__INITIAL_FILTER_STATE_V2__', state)
     })
 }

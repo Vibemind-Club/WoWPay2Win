@@ -5,6 +5,7 @@ import { computed, ref } from 'vue'
 import type { ItemAuction, RegionAuctions } from '../../../../common/Cache.ts'
 import type { RegionSlug } from '../../../../common/RegionConfig.ts'
 import { getRegionConnectedRealmIds } from '../../../../common/utils/getRegion.ts'
+import { BASE_PATH } from '../../../../common/Constants.ts'
 
 // ----------------------------------------------------------------------------
 // Store
@@ -23,7 +24,7 @@ export const useAuctionStore = defineStore('Auctions', () => {
             return
         }
 
-        const auctionsFile = `/data/auctions-${regionSlug}.json`
+        const auctionsFile = `${BASE_PATH}data/auctions-${regionSlug}.json`
         const response = await fetch(auctionsFile)
         const loadedAuctions = await response.json() as RegionAuctions
         auctions.value.set(regionSlug, loadedAuctions)

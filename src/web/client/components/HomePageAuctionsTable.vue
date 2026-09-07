@@ -13,6 +13,7 @@ import { ROWS_PER_PAGE } from '../../../common/Constants.ts'
 import { type Difficulty, type Tertiary, ALL_DIFFICULTIES, ALL_TERTIARIES } from '../../../common/ItemBonusId.ts'
 import { tokenPrices, currencyFormatters } from '../../../common/RegionConfig.ts'
 import { getItemDifficulty } from '../../../common/utils/getItemDifficulty.ts'
+import { getItemLevel } from '../../../common/utils/getItemLevel.ts'
 import { getRegionConnectedRealmName } from '../../../common/utils/getRegion.ts'
 
 type Pagination = Omit<Required<Required<QTable>['pagination']>, 'rowsNumber'>
@@ -43,8 +44,21 @@ const tableColumns = [
         headerClasses: 'sm-col',
     },
     {
-        name: 'colDifficulty',
+        // Fork addition: the real item level off the upgrade-track bonus id
+        // (318 / 321 / 324 for the three Mythic boss groups, and so on), so a
+        // sort by buyout shows where each level lands in the price.
+        name: 'colItemLevel',
         label: 'iLvl',
+        sortable: true,
+        align: 'left',
+        field: (auction: ItemAuction) => getItemLevel(auction.bonusIds),
+        format: (val?: number) => (val === undefined ? '' : val.toString()),
+        classes: 'sm-col',
+        headerClasses: 'sm-col',
+    },
+    {
+        name: 'colDifficulty',
+        label: 'Difficulty',
         sortable: true,
         align: 'left',
         field: (auction: ItemAuction) => getItemDifficulty(auction.bonusIds),
@@ -86,6 +100,7 @@ const visibleColumns = computed<Array<ColumnNames>>(() => {
     const columns: Array<ColumnNames> = []
 
     if (filterStore.enableDifficultyFilter) {
+        columns.push('colItemLevel')
         columns.push('colDifficulty')
     }
 
@@ -117,6 +132,12 @@ const sortAuctions = (auctions: Readonly<Auctions>, sortBy: string, descending: 
                     comp = x - y
                     break
                 }
+                case 'colItemLevel': {
+                    const x = getItemLevel(a.bonusIds) ?? 0
+                    const y = getItemLevel(b.bonusIds) ?? 0
+                    comp = x - y
+                    break
+                }
                 case 'colDifficulty': {
                     const x = getItemDifficulty(a.bonusIds) ?? 0
                     const y = getItemDifficulty(b.bonusIds) ?? 0
@@ -140,7 +161,7 @@ const sortAuctions = (auctions: Readonly<Auctions>, sortBy: string, descending: 
             return comp * (ascending ? 1 : -1)
         }
 
-        return (sortBy && compare(sortBy as ColumnNames, !descending)) || compare('colBuyout') || compare('colDifficulty', false) || compare('colItemId') || compare('colHasSocket', false) || compare('colTertiary', false)
+        return (sortBy && compare(sortBy as ColumnNames, !descending)) || compare('colBuyout') || compare('colItemLevel', false) || compare('colDifficulty', false) || compare('colItemId') || compare('colHasSocket', false) || compare('colTertiary', false)
     })
 }
 

@@ -6,16 +6,16 @@
 
     <title><%= require('@Constants').APP_NAME %></title>
     <meta name="description" content="<%= require('@Constants').APP_DESC %>">
-    <meta property="favicon" content="/favicon.ico">
+    <link rel="icon" href="<%= require('@Constants').BASE_PATH %>favicon.ico">
 
     <meta property="og:title" content="<%= require('@Constants').APP_NAME %>" />
     <meta property="og:description" content="<%= require('@Constants').OG_DESC %>" />
-    <meta property="og:image" content="https://www.wowpay2win.com/token-large.png" />
+    <meta property="og:image" content="<%= require('@Constants').WEB_URL %>token-large.png" />
+    <meta property="og:url" content="<%= require('@Constants').WEB_URL %>" />
 
     <meta name="twitter:title" content="<%= require('@Constants').APP_NAME %>" />
     <meta name="twitter:description" content="<%= require('@Constants').OG_DESC %>" />
-    <meta name="twitter:image" content="https://www.wowpay2win.com/token-large.png" />
-    <meta name="twitter:site" content="@trinovantes" />
+    <meta name="twitter:image" content="<%= require('@Constants').WEB_URL %>token-large.png" />
     <meta name="twitter:card" content="summary" />
 
     <link href="https://fonts.googleapis.com/css2?family=Material+Icons" rel="stylesheet">

@@ -37,7 +37,7 @@ async function main() {
         release: __GIT_HASH__,
         tracesSampleRate: 0.1,
         profilesSampleRate: 0.0,
-        enabled: !__IS_DEV__,
+        enabled: !__IS_DEV__ && SENTRY_DSN !== '',
     })
 
     await Sentry.startSpan({

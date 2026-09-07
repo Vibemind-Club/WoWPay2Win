@@ -3,7 +3,7 @@ import path from 'node:path'
 import { Type } from '@sinclair/typebox'
 import { TypeCompiler } from '@sinclair/typebox/compiler'
 import { SECONDARY, type Secondary, type Difficulty, DIFFICULTY } from '../common/ItemBonusId.ts'
-import { DIFFICULTY_BONUS_ID_DATA_FILE, SECONDARY_BONUS_ID_DATA_FILE, SOCKET_BONUS_ID_DATA_FILE } from '../common/Constants.ts'
+import { DIFFICULTY_BONUS_ID_DATA_FILE, ITEMLEVEL_BONUS_ID_DATA_FILE, SECONDARY_BONUS_ID_DATA_FILE, SOCKET_BONUS_ID_DATA_FILE } from '../common/Constants.ts'
 import type { BonusId } from '../common/api/BnetResponse.ts'
 
 type RaidbotsBonusJson = Record<string, unknown>
@@ -32,6 +32,10 @@ async function main() {
     const difficultyBonusIds = getDifficultyBonusIds(bonusJson)
     const difficultyBonusIdsFilePath = path.resolve(DIFFICULTY_BONUS_ID_DATA_FILE)
     await saveCache(difficultyBonusIds, difficultyBonusIdsFilePath)
+
+    const itemLevelBonusIds = getItemLevelBonusIds(bonusJson)
+    const itemLevelBonusIdsFilePath = path.resolve(ITEMLEVEL_BONUS_ID_DATA_FILE)
+    await saveCache(itemLevelBonusIds, itemLevelBonusIdsFilePath)
 }
 
 main().catch((err) => {
@@ -160,6 +164,41 @@ function getDifficultyBonusIds(bonusJson: RaidbotsBonusJson): DifficultyBonusIds
         }
 
         cache.push([bonusIdData.id, difficulty])
+    }
+
+    return cache
+}
+
+// ----------------------------------------------------------------------------
+// MARK: Item Level (fork addition)
+// ----------------------------------------------------------------------------
+
+// Raidbots labels every upgrade-track bonus id (Veteran/Champion/Hero/Myth N/6)
+// with the absolute item level it sets. Raid drops carry exactly one of these,
+// so the table can print the real number (318 / 321 / 324 ...) rather than
+// only the difficulty word.
+const itemLevelSchema = Type.Object({
+    id: Type.Unsafe<BonusId>(Type.Number()),
+    upgrade: Type.Object({
+        itemLevel: Type.Number(),
+    }),
+})
+
+const itemLevelValidator = TypeCompiler.Compile(itemLevelSchema)
+
+export type ItemLevelBonusIdsCacheFile = Array<
+    [BonusId, number]
+>
+
+function getItemLevelBonusIds(bonusJson: RaidbotsBonusJson): ItemLevelBonusIdsCacheFile {
+    const cache: ItemLevelBonusIdsCacheFile = []
+
+    for (const bonusIdData of Object.values(bonusJson)) {
+        if (!itemLevelValidator.Check(bonusIdData)) {
+            continue
+        }
+
+        cache.push([bonusIdData.id, bonusIdData.upgrade.itemLevel])
     }
 
     return cache

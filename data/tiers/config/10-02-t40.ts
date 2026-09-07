@@ -55,6 +55,7 @@ const config: TierConfig = {
         enableSocketFilter: true,
         enableTertiaryFilter: true,
         enableSecondaryFilter: true,
+        splitBySecondary: true,
     },
 }
 

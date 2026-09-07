@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
+import { FORK_REPO_URL, HOST_URL, UPSTREAM_REPO_URL } from '../../../common/Constants.ts'
 
 const DAYS_OF_WEEK = 7
 const daysSinceTues = (DAYS_OF_WEEK + (new Date().getDay() - 2)) % DAYS_OF_WEEK
@@ -42,8 +43,14 @@ onMounted(() => {
         <p class="flavor-text" v-text="flavorText" />
 
         <p class="links">
-            <a href="https://github.com/Trinovantes/WoWPay2Win">
-                GitHub
+            <a :href="UPSTREAM_REPO_URL">
+                Upstream (WoWPay2Win)
+            </a>
+            <a :href="FORK_REPO_URL">
+                Fork source
+            </a>
+            <a :href="HOST_URL">
+                Styka Sheets
             </a>
         </p>
     </footer>

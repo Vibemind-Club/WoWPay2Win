@@ -15,8 +15,9 @@ import TertiaryFilter from './Filters/TertiaryFilter.vue'
 import TierFilter from './Filters/TierFilter.vue'
 import HomePageAuctionsTable from './HomePageAuctionsTable.vue'
 import HomePageFlavorText from './HomePageFlavorText.vue'
+import HomePageCredit from './HomePageCredit.vue'
 import SecondaryFilter from './Filters/SecondaryFilter.vue'
-import { APP_DESC, APP_NAME } from '../../../common/Constants.ts'
+import { APP_DESC, APP_NAME, BASE_PATH } from '../../../common/Constants.ts'
 
 useFilterSyncLocalStorage()
 useFilterSyncQuery()
@@ -36,7 +37,7 @@ const lastUpdateFromNow = computed(() => auctionsStore.lastUpdateFromNow)
         <header class="shadow-2">
             <div class="logo">
                 <q-avatar size="40px">
-                    <img src="/token.png" :alt="APP_NAME" width="40" height="40">
+                    <img :src="`${BASE_PATH}token.png`" :alt="APP_NAME" width="40" height="40">
                 </q-avatar>
 
                 <h1>
@@ -55,6 +56,8 @@ const lastUpdateFromNow = computed(() => auctionsStore.lastUpdateFromNow)
                 <div class="group padded">
                     {{ APP_DESC }}
                 </div>
+
+                <HomePageCredit />
 
                 <template v-if="selectedRegion">
                     <div class="group padded">

@@ -18,7 +18,7 @@ const selectedTeriary = computed<SelectedSecondaries>({
 
 <template>
     <div
-        v-if="filterStore.enableSecondaryFilter"
+        v-if="filterStore.enableSecondaryFilter && !filterStore.splitBySecondary"
         class="group vpad"
     >
         <h2>

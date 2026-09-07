@@ -14,11 +14,13 @@ async function getTierConfigMap(): Promise<TierConfigMap> {
     } else {
         const fs = await import('node:fs/promises')
         const path  = await import('node:path')
+        const url = await import('node:url')
         const fileNames = await fs.readdir(TIERS_CONFIG_DIR)
 
         for (const fileName of fileNames.toSorted()) {
             const filePath = path.resolve(TIERS_CONFIG_DIR, fileName)
-            const tierConfig = await import(filePath) as { default: TierConfig }
+            // Fork fix: a bare Windows path is not a valid ESM specifier; a file:// URL is on every OS.
+            const tierConfig = await import(url.pathToFileURL(filePath).href) as { default: TierConfig }
             tierConfigs.push(tierConfig.default)
         }
     }

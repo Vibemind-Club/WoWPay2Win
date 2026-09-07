@@ -3,7 +3,7 @@ import { getItemHasSocket } from '../../../../common/utils/getItemHasSocket.ts'
 import { getItemTertiary } from '../../../../common/utils/getItemTertiary.ts'
 import { getAuctionSecondary } from '../../../../common/utils/getItemSecondary.ts'
 import { computed, ref } from 'vue'
-import { type Tier, getTierBoeIds } from '../../../../common/Boe.ts'
+import { type Tier, type BoeKey, getTierBoeKeys, getAuctionBoeKey, isTierSplitBySecondary } from '../../../../common/Boe.ts'
 import type { ItemAuction } from '../../../../common/Cache.ts'
 import { GOLD_CAP } from '../../../../common/Constants.ts'
 import { type Tertiary, type Secondary, ALL_TERTIARIES, ALL_SECONDARIES, type Difficulty, ALL_DIFFICULTIES } from '../../../../common/ItemBonusId.ts'
@@ -11,7 +11,7 @@ import type { RegionSlug } from '../../../../common/RegionConfig.ts'
 import { getItemDifficulty } from '../../../../common/utils/getItemDifficulty.ts'
 import { defaultTier, tierConfigMap } from '../../../../common/utils/getTierConfigMap.ts'
 import { getRegionRealmIds } from '../../../../common/utils/getRegion.ts'
-import type { ItemId, RealmId } from '../../../../common/api/BnetResponse.ts'
+import type { RealmId } from '../../../../common/api/BnetResponse.ts'
 
 // ----------------------------------------------------------------------------
 // State
@@ -19,7 +19,7 @@ import type { ItemId, RealmId } from '../../../../common/api/BnetResponse.ts'
 
 export type RegionFilter = RegionSlug | null
 export type RealmFilter = Set<RealmId>
-export type BoeFilter = Set<ItemId>
+export type BoeFilter = Set<BoeKey>
 export type DifficultyFilter = Set<Difficulty>
 export type TertiaryFilter = Set<Tertiary>
 export type SecondaryFilter = Set<Secondary>
@@ -89,13 +89,18 @@ export const useFilterStore = defineStore('Filter', () => {
     const enableTertiaryFilter = computed(() => Boolean(tierConfigMap.get(tier.value)?.features?.enableTertiaryFilter))
     const enableSecondaryFilter = computed(() => Boolean(tierConfigMap.get(tier.value)?.features?.enableSecondaryFilter))
 
+    // Fork addition: on a split tier the picker lists each BoE once per secondary
+    // pair and the global Secondaries filter is hidden, because the variant IS
+    // the filter.
+    const splitBySecondary = computed(() => isTierSplitBySecondary(tierConfigMap, tier.value))
+
     const changeRegion = (newRegion: RegionFilter): void => {
         region.value = newRegion
         realms.value = new Set()
     }
 
     const shouldShowAuction = (auction: ItemAuction): boolean => {
-        if (!boes.value.has(auction.itemId)) {
+        if (!boes.value.has(getAuctionBoeKey(auction, splitBySecondary.value))) {
             return false
         }
 
@@ -124,7 +129,7 @@ export const useFilterStore = defineStore('Filter', () => {
             }
         }
 
-        if (enableSecondaryFilter.value) {
+        if (enableSecondaryFilter.value && !splitBySecondary.value) {
             const itemSecondary = getAuctionSecondary(auction)
             if (secondaries.value.size > 0 && !equal(secondaries.value, itemSecondary)) {
                 return false
@@ -150,7 +155,7 @@ export const useFilterStore = defineStore('Filter', () => {
         }
 
         if (boes.value.size > 0) {
-            queryFilters.boes = exportNumSet(boes.value)
+            queryFilters.boes = exportStrSet(boes.value)
         }
 
         if (maxBuyout.value < GOLD_CAP) {
@@ -200,9 +205,9 @@ export const useFilterStore = defineStore('Filter', () => {
         }
 
         if (queryFilters.boes) {
-            const validBoeIds = getTierBoeIds(tierConfigMap, tier.value)
-            const importedBoes = importNumArray(queryFilters.boes, validBoeIds)
-            boes.value = new Set(importedBoes as Array<ItemId>)
+            const validBoeKeys = getTierBoeKeys(tierConfigMap, tier.value)
+            const importedBoes = importStrArray(queryFilters.boes, validBoeKeys)
+            boes.value = new Set(importedBoes)
         }
 
         if (queryFilters.maxBuyout) {
@@ -254,6 +259,7 @@ export const useFilterStore = defineStore('Filter', () => {
         enableSocketFilter,
         enableTertiaryFilter,
         enableSecondaryFilter,
+        splitBySecondary,
 
         changeRegion,
         changeTier,
@@ -277,6 +283,16 @@ function clamp(val: number, min: number, max: number): number {
 
 function exportNumSet(set: Set<number>): string {
     return [...set].toSorted((a, b) => a - b).join(DELIMITER)
+}
+
+function exportStrSet(set: Set<string>): string {
+    return [...set].toSorted().join(DELIMITER)
+}
+
+function importStrArray<T extends string>(setString: string, validValues: ReadonlyArray<T>): Array<T> {
+    return setString
+        .split(DELIMITER)
+        .filter((value): value is T => (validValues as ReadonlyArray<string>).includes(value))
 }
 
 function importNumArray<T extends number = number>(setString: string, validValues: ReadonlyArray<number>): Array<T> {
