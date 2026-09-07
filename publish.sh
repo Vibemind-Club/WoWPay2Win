@@ -78,13 +78,15 @@ for f in "${files[@]}"; do
   case "$f" in
     *.map|*.LICENSE.txt) continue ;;
   esac
-  code="$(curl -s -m 20 -o /dev/null -w '%{http_code}' "$URL$f")"
-  [ "$code" = "200" ] || die "$f answered http $code"
+  # `|| true` inside the substitution: under set -e a curl that cannot connect
+  # would otherwise abort the script silently, with no verdict printed.
+  code="$(curl -s -m 30 -o /dev/null -w '%{http_code}' "$URL$f" || true)"
+  [ "$code" = "200" ] || die "$f answered http ${code:-<no response>}"
 done
 
 say "verifying $URL ..."
 live="$(curl -s -m 20 "$URL")"
 printf '%s' "$live" | grep -q "$bundle" || die "live index.html does not reference $bundle"
-code="$(curl -s -m 20 -o /dev/null -w '%{http_code}' "$URL$bundle")"
+code="$(curl -s -m 30 -o /dev/null -w '%{http_code}' "$URL$bundle" || true)"
 [ "$code" = "200" ] || die "bundle $bundle answered http $code"
 say "published: $URL serves $bundle"
