@@ -17,9 +17,9 @@ import { FORK_REPO_URL, HOST_HUB_URL, HOST_NAME, HOST_URL, UPSTREAM_AUTHOR, UPST
             the real item level next to the difficulty.
         </p>
         <p>
-            <strong>This page is temporary.</strong> The moment {{ UPSTREAM_AUTHOR }} adds these two
-            things to <a :href="UPSTREAM_SITE_URL">wowpay2win.com</a>, this fork comes down and the
-            link here points at his site.
+            <strong>This page is temporary.</strong> It comes down if
+            <a :href="UPSTREAM_SITE_URL">wowpay2win.com</a> starts showing this information itself,
+            and the link here will point there instead.
         </p>
         <p class="links">
             <a :href="FORK_REPO_URL">Fork source</a>

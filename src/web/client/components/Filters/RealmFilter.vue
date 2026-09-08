@@ -52,6 +52,11 @@ const filterFn = (val: string, doneFn: (callbackFn: () => void) => void): void =
             {{ region?.toUpperCase() }} Realm Filter
         </h2>
 
+        <p class="realm-note">
+            BoEs are region-wide: anything you buy lands in your Warband bank, so the realm it was listed on does not matter.
+            This filter stays for legacy use. Leave it empty and buy on whichever realm has the cheapest listing.
+        </p>
+
         <q-select
             v-model="selectedRealms"
             :options="filteredRealms"
@@ -83,3 +88,12 @@ const filterFn = (val: string, doneFn: (callbackFn: () => void) => void): void =
         </q-select>
     </div>
 </template>
+
+<style lang="scss" scoped>
+.realm-note {
+    margin: 0 0 12px;
+    font-size: 0.85em;
+    line-height: 1.4;
+    opacity: 0.8;
+}
+</style>

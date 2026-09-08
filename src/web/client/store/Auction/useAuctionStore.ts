@@ -24,8 +24,13 @@ export const useAuctionStore = defineStore('Auctions', () => {
             return
         }
 
-        const auctionsFile = `${BASE_PATH}data/auctions-${regionSlug}.json`
-        const response = await fetch(auctionsFile)
+        // Bucket the cache key to the mirror's 5-minute cadence and skip the browser
+        // cache outright: Cloudflare rewrites the origin's max-age=300 up to its 4h
+        // browser TTL, so a bare fetch handed back a copy hours old and Last Update
+        // read "about 2 hours ago" against a mirror that was 12 minutes behind.
+        const bucket = Math.floor(Date.now() / (5 * 60 * 1000))
+        const auctionsFile = `${BASE_PATH}data/auctions-${regionSlug}.json?t=${bucket}`
+        const response = await fetch(auctionsFile, { cache: 'no-store' })
         const loadedAuctions = await response.json() as RegionAuctions
         auctions.value.set(regionSlug, loadedAuctions)
     }
