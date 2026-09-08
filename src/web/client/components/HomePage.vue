@@ -13,6 +13,7 @@ import RegionFilter from './Filters/RegionFilter.vue'
 import SocketFilter from './Filters/SocketFilter.vue'
 import TertiaryFilter from './Filters/TertiaryFilter.vue'
 import TierFilter from './Filters/TierFilter.vue'
+import DifficultyQuickFilter from './Filters/DifficultyQuickFilter.vue'
 import HomePageAuctionsTable from './HomePageAuctionsTable.vue'
 import HomePageFlavorText from './HomePageFlavorText.vue'
 import HomePageCredit from './HomePageCredit.vue'
@@ -48,6 +49,7 @@ const lastUpdateFromNow = computed(() => auctionsStore.lastUpdateFromNow)
             <div class="filters">
                 <RegionFilter />
                 <TierFilter />
+                <DifficultyQuickFilter />
             </div>
         </header>
 
