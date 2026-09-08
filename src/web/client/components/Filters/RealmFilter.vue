@@ -55,7 +55,6 @@ const filterFn = (val: string, doneFn: (callbackFn: () => void) => void): void =
         <p class="realm-note">
             The realm a BoE is listed on does not have to be yours. Make a level 1 on that realm, pull gold from your Warband bank,
             buy the BoE, put it in the Warband bank, then withdraw it on the toon and realm you want to equip or resell on.
-            Use this filter to check your own realm; buy wherever it is cheapest.
         </p>
 
         <q-select
