@@ -8,13 +8,18 @@ import { FORK_REPO_URL, HOST_HUB_URL, HOST_NAME, HOST_URL, UPSTREAM_AUTHOR, UPST
             <strong>This is a fork of {{ UPSTREAM_NAME }}</strong> by
             <a :href="UPSTREAM_REPO_URL">{{ UPSTREAM_AUTHOR }}</a> (AGPL-3.0).
             The scanner, the site and the auction data are his work: the listings here
-            are mirrored from <a :href="UPSTREAM_SITE_URL">wowpay2win.com</a> every 30 minutes.
+            are mirrored from <a :href="UPSTREAM_SITE_URL">wowpay2win.com</a> every 5 minutes.
         </p>
         <p>
             What <a :href="HOST_URL">{{ HOST_NAME }}</a> changed: every raid BoE is listed once per
             secondary-stat pair (Crit / Vers and Vers / Crit are different rolls, so both are
             listed), so one variant can be viewed and priced on its own, and the table shows
             the real item level next to the difficulty.
+        </p>
+        <p>
+            <strong>This page is temporary.</strong> The moment {{ UPSTREAM_AUTHOR }} adds these two
+            things to <a :href="UPSTREAM_SITE_URL">wowpay2win.com</a>, this fork comes down and the
+            link here points at his site.
         </p>
         <p class="links">
             <a :href="FORK_REPO_URL">Fork source</a>
