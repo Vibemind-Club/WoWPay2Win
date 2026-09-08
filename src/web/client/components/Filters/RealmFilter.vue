@@ -53,8 +53,9 @@ const filterFn = (val: string, doneFn: (callbackFn: () => void) => void): void =
         </h2>
 
         <p class="realm-note">
-            BoEs are region-wide: anything you buy lands in your Warband bank, so the realm it was listed on does not matter.
-            This filter stays for legacy use. Leave it empty and buy on whichever realm has the cheapest listing.
+            The realm a BoE is listed on does not have to be yours. Make a level 1 on that realm, pull gold from your Warband bank,
+            buy the BoE, put it in the Warband bank, then withdraw it on the toon and realm you want to equip or resell on.
+            Use this filter to check your own realm; buy wherever it is cheapest.
         </p>
 
         <q-select
