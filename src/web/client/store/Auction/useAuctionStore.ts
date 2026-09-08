@@ -19,7 +19,7 @@ export const useAuctionStore = defineStore('Auctions', () => {
     const auctions = ref(new Map<RegionSlug, RegionAuctions>())
     const loadAuctions = async (regionSlug: RegionSlug): Promise<void> => {
         const regionAuctions = auctions.value.get(regionSlug)
-        const regionExpired = (Date.now() - (regionAuctions?.lastUpdate ?? 0)) > (3600 * 1000) // Expire after 1 hour
+        const regionExpired = (Date.now() - (regionAuctions?.lastUpdate ?? 0)) > (5 * 60 * 1000) // Expire after 5 minutes - the host's mirror refreshes on that cadence
         if (!regionExpired) {
             return
         }
