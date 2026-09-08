@@ -8,7 +8,7 @@ import { FORK_REPO_URL, HOST_HUB_URL, HOST_NAME, HOST_URL, UPSTREAM_AUTHOR, UPST
             <strong>This is a fork of {{ UPSTREAM_NAME }}</strong> by
             <a :href="UPSTREAM_REPO_URL">{{ UPSTREAM_AUTHOR }}</a> (AGPL-3.0).
             The scanner, the site and the auction data are his work: the listings here
-            are mirrored from <a :href="UPSTREAM_SITE_URL">wowpay2win.com</a> every 5 minutes.
+            come from <a :href="UPSTREAM_SITE_URL">wowpay2win.com</a>, whose scanner rewrites them twice an hour; this page checks for a new copy every 5 minutes, so it is never more than 5 minutes behind his site.
         </p>
         <p>
             What <a :href="HOST_URL">{{ HOST_NAME }}</a> changed: every raid BoE is listed once per
