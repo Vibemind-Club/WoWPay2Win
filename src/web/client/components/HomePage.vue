@@ -141,6 +141,15 @@ aside{
     background: $bg-side;
     display: flex;
     flex-direction: column;
+    // The filter column is the tallest thing on the page, so it used to set the page height while the
+    // table sat sticky inside a column stretched to match - reaching the bottom of the table meant
+    // scrolling past the whole filter list first. Pin the column to the viewport with its own scrollbar
+    // instead, and let the table drive the page (Evan 2026-09-08).
+    position: sticky;
+    top: 0;
+    align-self: start;
+    max-height: 100vh;
+    overflow-y: auto;
 
     .vspace{
         flex: 1;
@@ -148,7 +157,6 @@ aside{
 }
 
 .table-wrapper{
-    position: sticky;
-    top: 0;
+    position: static;
 }
 </style>
