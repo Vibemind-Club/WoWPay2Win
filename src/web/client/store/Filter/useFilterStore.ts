@@ -9,6 +9,7 @@ import { GOLD_CAP } from '../../../../common/Constants.ts'
 import { type Tertiary, type Secondary, ALL_TERTIARIES, ALL_SECONDARIES, type Difficulty, ALL_DIFFICULTIES } from '../../../../common/ItemBonusId.ts'
 import type { RegionSlug } from '../../../../common/RegionConfig.ts'
 import { getItemDifficulty } from '../../../../common/utils/getItemDifficulty.ts'
+import { getItemLevel } from '../../../../common/utils/getItemLevel.ts'
 import { defaultTier, tierConfigMap } from '../../../../common/utils/getTierConfigMap.ts'
 import { getRegionRealmIds } from '../../../../common/utils/getRegion.ts'
 import type { RealmId } from '../../../../common/api/BnetResponse.ts'
@@ -21,6 +22,8 @@ export type RegionFilter = RegionSlug | null
 export type RealmFilter = Set<RealmId>
 export type BoeFilter = Set<BoeKey>
 export type DifficultyFilter = Set<Difficulty>
+// Fork: exact item levels to show (empty = all). Header chip row, values come from the loaded auctions.
+export type ItemLevelFilter = Set<number>
 export type TertiaryFilter = Set<Tertiary>
 export type SecondaryFilter = Set<Secondary>
 
@@ -33,6 +36,7 @@ type QueryFiltersField =
     | 'realms'
     | 'boes'
     | 'difficulty'
+    | 'ilvl'
     | 'maxBuyout'
     | 'mustHaveSocket'
     | 'tertiaries'
@@ -62,6 +66,7 @@ export const useFilterStore = defineStore('Filter', () => {
     const maxBuyout = ref(GOLD_CAP)
     const mustHaveSocket = ref(false)
     const difficulties = ref<DifficultyFilter>(new Set())
+    const itemLevels = ref<ItemLevelFilter>(new Set())
     const tertiaries = ref<TertiaryFilter>(new Set())
     const secondaries = ref<SecondaryFilter>(new Set())
 
@@ -71,6 +76,7 @@ export const useFilterStore = defineStore('Filter', () => {
         maxBuyout.value = GOLD_CAP
         mustHaveSocket.value = false
         difficulties.value = new Set()
+        itemLevels.value = new Set()
         tertiaries.value = new Set()
         secondaries.value = new Set()
     }
@@ -111,6 +117,13 @@ export const useFilterStore = defineStore('Filter', () => {
         if (enableDifficultyFilter.value) {
             const itemDifficulty = getItemDifficulty(auction.bonusIds)
             if (difficulties.value.size > 0 && (itemDifficulty === undefined || !difficulties.value.has(itemDifficulty))) {
+                return false
+            }
+        }
+
+        if (itemLevels.value.size > 0) {
+            const itemLevel = getItemLevel(auction.bonusIds)
+            if (itemLevel === undefined || !itemLevels.value.has(itemLevel)) {
                 return false
             }
         }
@@ -170,6 +183,10 @@ export const useFilterStore = defineStore('Filter', () => {
             queryFilters.difficulty = exportNumSet(difficulties.value)
         }
 
+        if (itemLevels.value.size > 0) {
+            queryFilters.ilvl = exportNumSet(itemLevels.value)
+        }
+
         if (tertiaries.value.size > 0) {
             queryFilters.tertiaries = exportNumSet(tertiaries.value)
         }
@@ -227,6 +244,15 @@ export const useFilterStore = defineStore('Filter', () => {
             difficulties.value = new Set(importedDifficulties)
         }
 
+        if (queryFilters.ilvl) {
+            // Any plausible item level; the chip row only offers the ones present in the data.
+            const importedItemLevels = queryFilters.ilvl
+                .split(DELIMITER)
+                .map((value) => parseInt(value))
+                .filter((value) => Number.isInteger(value) && value > 0 && value < 1000)
+            itemLevels.value = new Set(importedItemLevels)
+        }
+
         if (queryFilters.tertiaries) {
             const validTertiaries = ALL_TERTIARIES.map((tertiary) => tertiary.bonusId)
             const importedTertiaries = importNumArray<Tertiary>(queryFilters.tertiaries, validTertiaries)
@@ -249,6 +275,7 @@ export const useFilterStore = defineStore('Filter', () => {
         maxBuyout,
         mustHaveSocket,
         difficulties,
+        itemLevels,
         tertiaries,
         secondaries,
 

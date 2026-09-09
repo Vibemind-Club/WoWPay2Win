@@ -6,6 +6,9 @@ import type { ItemAuction, RegionAuctions } from '../../../../common/Cache.ts'
 import type { RegionSlug } from '../../../../common/RegionConfig.ts'
 import { getRegionConnectedRealmIds } from '../../../../common/utils/getRegion.ts'
 import { BASE_PATH } from '../../../../common/Constants.ts'
+import { getTierBoeIds } from '../../../../common/Boe.ts'
+import { getItemLevel } from '../../../../common/utils/getItemLevel.ts'
+import { tierConfigMap } from '../../../../common/utils/getTierConfigMap.ts'
 
 // ----------------------------------------------------------------------------
 // Store
@@ -56,6 +59,31 @@ export const useAuctionStore = defineStore('Auctions', () => {
             return true
         })
     })
+    // Fork: every item level present in the loaded region for the current tier's BoEs,
+    // ascending - the header ilvl chip row is built from this so it never offers a
+    // level nothing is listed at. Region-wide and selection-independent so the row
+    // does not jump around as items are picked.
+    const tierItemLevels = computed<Array<number>>(() => {
+        if (filterStore.region === null) {
+            return []
+        }
+
+        const tierItemIds = new Set(getTierBoeIds(tierConfigMap, filterStore.tier))
+        const levels = new Set<number>()
+        for (const auction of auctions.value.get(filterStore.region)?.auctions ?? []) {
+            if (!tierItemIds.has(auction.itemId)) {
+                continue
+            }
+
+            const itemLevel = getItemLevel(auction.bonusIds)
+            if (itemLevel !== undefined) {
+                levels.add(itemLevel)
+            }
+        }
+
+        return [...levels].toSorted((a, b) => a - b)
+    })
+
     const tokenPrice = computed<number | undefined>(() => {
         if (filterStore.region === null) {
             return
@@ -109,6 +137,7 @@ export const useAuctionStore = defineStore('Auctions', () => {
     return {
         loadAuctions,
         filteredAuctions,
+        tierItemLevels,
         tokenPrice,
 
         lastUpdateIso,
