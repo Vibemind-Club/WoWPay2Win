@@ -6,7 +6,6 @@ import { useFilterStore } from '../store/Filter/useFilterStore.ts'
 import { useFilterSyncLocalStorage } from '../store/Filter/useFilterSyncLocalStorage.ts'
 import { useFilterSyncQuery } from '../store/Filter/useFilterSyncQuery.ts'
 import BoeFilter from './Filters/BoeFilter.vue'
-import DifficultyFilter from './Filters/DifficultyFilter.vue'
 import MaxBuyoutFilter from './Filters/MaxBuyoutFilter.vue'
 import RealmFilter from './Filters/RealmFilter.vue'
 import RegionFilter from './Filters/RegionFilter.vue'
@@ -47,9 +46,21 @@ const lastUpdateFromNow = computed(() => auctionsStore.lastUpdateFromNow)
             </div>
 
             <div class="filters">
-                <RegionFilter />
-                <TierFilter />
-                <DifficultyQuickFilter />
+                <div class="selects">
+                    <RegionFilter />
+                    <TierFilter />
+                </div>
+                <!-- Fork: every per-listing filter sits up here (Evan, 2026-09-09) - the sidebar
+                     copies lived under a 100-entry BoE picker and people scrolled past them. -->
+                <div
+                    v-if="selectedRegion"
+                    class="quick-bar"
+                >
+                    <DifficultyQuickFilter />
+                    <TertiaryFilter />
+                    <SocketFilter />
+                    <MaxBuyoutFilter />
+                </div>
             </div>
         </header>
 
@@ -71,11 +82,7 @@ const lastUpdateFromNow = computed(() => auctionsStore.lastUpdateFromNow)
 
                     <RealmFilter />
                     <BoeFilter />
-                    <DifficultyFilter />
-                    <MaxBuyoutFilter />
-                    <SocketFilter />
                     <SecondaryFilter />
-                    <TertiaryFilter />
                 </template>
                 <template v-else>
                     <q-banner>
@@ -130,10 +137,23 @@ header{
 
     .filters{
         background-color: $bg-side;
-        display: grid;
-        grid-template-columns: math.div($sidebar-min-width, 2) 1fr;
+        display: flex;
+        flex-direction: column;
         gap: $padding;
         padding: $padding;
+
+        .selects{
+            display: grid;
+            grid-template-columns: math.div($sidebar-min-width, 2) 1fr;
+            gap: $padding;
+        }
+
+        .quick-bar{
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: $padding $side-padding;
+        }
     }
 }
 

@@ -1,39 +1,38 @@
 <script lang="ts" setup>
-import { computed } from 'vue'
 import { useFilterStore } from '../../store/Filter/useFilterStore.ts'
 
+// Fork: a single toggle in the header quick bar (was a sidebar checkbox - owner,
+// 2026-09-09). On = only listings whose bonus ids carry a socket; gear with a
+// guaranteed socket (no socket bonus id) is filtered out too, as upstream noted.
 const filterStore = useFilterStore()
-const mustHaveSocket = computed<boolean>({
-    get() {
-        return filterStore.mustHaveSocket
-    },
-    set(mustHaveSocket) {
-        filterStore.mustHaveSocket = mustHaveSocket
-    },
-})
+
+function toggle(): void {
+    filterStore.mustHaveSocket = !filterStore.mustHaveSocket
+}
 </script>
 
 <template>
     <div
         v-if="filterStore.enableSocketFilter"
-        class="group vpad"
+        class="quick-filter"
+        role="group"
+        aria-label="Socket"
     >
-        <q-list>
-            <q-item v-ripple tag="label">
-                <q-item-section avatar>
-                    <q-checkbox
-                        v-model="mustHaveSocket"
-                    />
-                </q-item-section>
-                <q-item-section>
-                    <q-item-label>
-                        <strong>Must have socket</strong>
-                    </q-item-label>
-                    <q-item-label caption>
-                        This will also filter out gear with guaranteed sockets
-                    </q-item-label>
-                </q-item-section>
-            </q-item>
-        </q-list>
+        <span class="quick-label">Socket</span>
+        <q-btn
+            dense
+            no-caps
+            size="sm"
+            color="secondary"
+            :unelevated="filterStore.mustHaveSocket"
+            :outline="!filterStore.mustHaveSocket"
+            label="Must have socket"
+            :aria-pressed="filterStore.mustHaveSocket"
+            @click="toggle"
+        >
+            <q-tooltip>
+                Only listings with a socket. Gear with a guaranteed socket is filtered out as well.
+            </q-tooltip>
+        </q-btn>
     </div>
 </template>
